@@ -1,0 +1,109 @@
+# version: '3.5'
+
+# services:
+#   postgres:
+#     container_name: postgres_container
+#     image: postgres
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_USER:-postgres}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+#       PGDATA: /data/postgres
+#     volumes:
+#        - postgres:/data/postgres
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - postgres
+#     restart: unless-stopped
+  
+#   pgadmin:
+#     container_name: pgadmin_container
+#     image: dpage/pgadmin4
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+#       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+#       PGADMIN_CONFIG_SERVER_MODE: 'False'
+#     volumes:
+#        - pgadmin:/var/lib/pgadmin
+
+#     ports:
+#       - "${PGADMIN_PORT:-5050}:80"
+#     networks:
+#       - postgres
+#     restart: unless-stopped
+
+#   nifi:
+#     image: apache/nifi:latest
+#     container_name: nifi
+#     ports:
+#     volumes:
+#       - "8080:8080"
+#       - ./conf:/opt/nifi/nifi-current/conf
+#       - ./data:/opt/nifi/nifi-current/data
+#       - ./logs:/opt/nifi/nifi-current/logs
+#       - ./database:/opt/nifi/nifi-current/database
+#     environment:
+#       - NIFI_WEB_HTTP_HOST=0.0.0.0
+#       - NIFI_WEB_HTTP_PORT=8080
+#       - NIFI_WEB_HTTPS_PORT=8443
+#       - NIFI_SECURITY_AUTHENTICATE_PROXY_USERS=
+#     restart: always
+
+
+# networks:
+#   postgres:
+#     driver: bridge
+
+# volumes:
+#   postgres:
+#   pgadmin:
+#   conf:
+#     external: false
+
+
+
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: pgs
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - db_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@mail.ru
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - db_network
+
+  nifi:
+    # image: apache/nifi:latest
+    image: nifi_file
+    restart: always
+    environment:
+      SINGLE_USER_CREDENTIALS_USERNAME: admin
+      SINGLE_USER_CREDENTIALS_PASSWORD: asdasdaszxv1432432
+    ports:
+      - "8443:8443"
+
+    networks:
+      - db_network
+
+networks:
+  db_network:
